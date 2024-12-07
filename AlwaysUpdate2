@@ -1,0 +1,215 @@
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+local Window = OrionLib:MakeWindow({Name = "ALWAYS HUB (VERSION 1.1)", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
+local plr = game.Players.LocalPlayer
+OrionLib:MakeNotification({
+            Name = "Always HUB",
+            Content = "Loading...",
+            Image = "rbxassetid://4483345998",
+            Time = 9
+        })
+        wait(5)
+local Tab = Window:MakeTab({
+    Name = "Dupe",
+    Icon = "rbxassetid://8092240674",
+    PremiumOnly = false
+})
+local teleport = Window:MakeTab({
+    Name = "Teleport",
+    Icon = "rbxassetid://8092240674",
+    PremiumOnly = false
+})
+local faq = Window:MakeTab({
+    Name = "FAQ",
+    Icon = "rbxassetid://8092240674",
+    PremiumOnly = false
+})
+local settings = Window:MakeTab({
+    Name = "Settings",
+    Icon = "rbxassetid://8092240674",
+    PremiumOnly = false
+})
+
+teleport:AddLabel("Events, teleport Coming soon...")
+
+settings:AddLabel("More Coming soon...")
+
+settings:AddColorpicker({
+	Name = "Colorpicker",
+	Default = Color3.fromRGB(255, 0, 0),
+	Callback = function(Value)
+		print(Value)
+	end,
+})
+
+settings:AddSlider({
+    Name = "WalkSpeed",
+    Min = 0,
+    Max = 100,
+    Default = 16,
+    Color = Color3.fromRGB(255,255,255),
+    Increment = 1,
+    ValueName = "walkspeed",
+    Callback = function(Value)
+       plr.Character.Humanoid.WalkSpeed = Value
+    end
+})
+
+settings:AddSlider({
+    Name = "JumpHeight",
+    Min = 0,
+    Max = 250,
+    Default = 46,
+    Color = Color3.fromRGB(255,255,255),
+    Increment = 1,
+    ValueName = "walkspeed",
+    Callback = function(Value)
+       plr.Character.Humanoid.JumpPower = Value
+    end
+})
+
+faq:AddLabel("Join Discord server for more scripts and script logs")
+
+faq:AddButton({
+    Name = "Copy discord server link",
+    Callback = function()
+
+        OrionLib:MakeNotification({
+            Name = "Discord server",
+            Content = "Link copied to clipboard...",
+            Image = "rbxassetid://4483345998",
+            Time = 5
+        })
+        setclipboard("https://discord.gg/SXHcWjbE")
+        end
+})
+
+Tab:AddLabel("USE IT ON YOUR RISK")
+
+Tab:AddButton({
+    Name = "Get inf money and all rods(devs include)",
+    Callback = function()
+
+        OrionLib:MakeNotification({
+            Name = "Dupe",
+            Content = "If you use this, you can get wiped or banned!",
+            Image = "rbxassetid://4483345998",
+            Time = 5
+        })
+        wait(5)
+        OrionLib:MakeNotification({
+            Name = "Dupe",
+            Content = "In procces...",
+            Image = "rbxassetid://4483345998",
+            Time = 25
+        })
+        wait(25)
+        OrionLib:MakeNotification({
+            Name = "Dupe",
+            Content = "Succesful!",
+            Image = "rbxassetid://4483345998",
+            Time = 5
+        })
+
+        local function purchaseRods()
+            local rodsFolder = game:GetService("ReplicatedStorage").resources.items.rods
+            if not rodsFolder then
+                warn("Folder Rods not found")
+                return
+            end
+
+            local purchaseEvent = game:GetService("ReplicatedStorage").events.purchase
+            local quantity = math.huge
+
+            for _, rod in ipairs(rodsFolder:GetChildren()) do
+                if rod:IsA("Folder") then
+                    local rodName = rod.Name
+                    purchaseEvent:FireServer(rodName, "Rod", nil, quantity)
+                end
+            end
+        end
+
+
+        purchaseRods()
+        task.delay(1, purchaseRods) 
+    end
+})
+
+local lvl = plr:FindFirstChild("leaderstats").Level
+
+Tab:AddSlider({
+    Name = "Level",
+    Min = 0,
+    Max = 750,
+    Default = 0,
+    Color = Color3.fromRGB(255,255,255),
+    Increment = 1,
+    ValueName = "Level",
+    Callback = function(Value)
+        lvl = Value
+    end
+})
+
+Tab:AddSection({Name = "Buy any item"})
+
+
+local itemsFolder = game:GetService("ReplicatedStorage").resources.items.items
+local itemOptions = {}
+
+if itemsFolder then
+    for _, item in ipairs(itemsFolder:GetChildren()) do
+        if item:IsA("Folder") then
+            table.insert(itemOptions, item.Name)
+        end
+    end
+else
+    warn("Items folder not found")
+end
+
+
+local selectedItem = ""
+local selectedAmount = 1
+
+
+Tab:AddDropdown({
+    Name = "Item",
+    Default = itemOptions[1] or "None",
+    Options = itemOptions,
+    Callback = function(Value)
+        selectedItem = Value
+        print("Selected item:", selectedItem)
+    end    
+})
+
+
+Tab:AddTextbox({
+    Name = "Amount",
+    Default = "Amount of items",
+    TextDisappear = true,
+    Callback = function(Value)
+        local amount = tonumber(Value)
+        if amount and amount > 0 then
+            selectedAmount = amount
+            print("Selected amount:", selectedAmount)
+        else
+            warn("Invalid amount entered")
+        end
+    end   
+})
+
+
+Tab:AddButton({
+    Name = "Buy selected item",
+    Callback = function()
+        if selectedItem == "" then
+            warn("No item selected")
+            return
+        end
+
+        game:GetService("ReplicatedStorage").events.purchase:FireServer(selectedItem, "Item", nil, selectedAmount)
+        print("Purchased", selectedAmount, selectedItem)
+    end
+})
+
+Tab:AddLabel("NUKES AND TREASURE MAPS DOESNT STACK")
+
+print("Always Hub Loaded!")
